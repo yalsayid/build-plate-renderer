@@ -1,0 +1,55 @@
+{
+  "name": "build-plate-renderer",
+  "private": false,
+  "version": "0.1.0",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --external react",
+    "clean": "rm -rf dist",
+    "lint": "tsc",
+    "format": "prettier --write ./src",
+    "format:check": "prettier -->check ./src"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.97.3",
+    "@react-three/fiber": "^8.15.16",
+    "@use-gesture/react": "^10.3.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "immer": "^10.0.3",
+    "lodash": "^4.17.21",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.2.1",
+    "three": "^0.161.0",
+    "three-stdlib": "^2.29.4",
+    "uuid": "^9.0.1",
+    "zundo": "2.0.0",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/eslint": "^8.56.2",
+    "@types/lodash": "^4.14.202",
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.19",
+    "@types/three": "^0.161.2",
+    "@types/uuid": "^9.0.8",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35",
+    "prettier": "^3.2.5",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  }
+}
