@@ -3,14 +3,10 @@
   "display": "React Library",
   "extends": "./base.json",
   "compilerOptions": {
-    "moduleResolution": "Node",
-    "module": "ESNext",
-    "outDir": "dist",
-    "sourceMap": true,
-    "declaration": true,
-    "composite": true,
-    "declarationMap": true,
     "lib": ["es2022", "dom", "dom.iterable"],
-    "jsx": "react-jsx"
+    "module": "ESNext",
+    "target": "ES6",
+    "jsx": "react-jsx",
+    "noEmit": true
   }
 }

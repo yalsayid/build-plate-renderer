@@ -1,4 +1,4 @@
-import { IModel } from '../types/types';
+import { IModel } from '@/types/types';
 
 export const isModelOutOfPlate = (models: IModel[], buildPlateSize: [number, number, number]) => {
   let outOfPlateModels: IModel[] = [];

@@ -1,19 +1,19 @@
 {
-  "name": "build-plate-renderer",
   "private": true,
   "workspaces": [
     "apps/**",
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "build": "turbo run build",
+    "clean": "turbo run clean",
+    "dev": "turbo run dev",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint": "turbo run lint",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
     "prettier": "^3.1.1",
     "turbo": "latest"
   },

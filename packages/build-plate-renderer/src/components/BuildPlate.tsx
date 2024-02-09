@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { extend, useFrame, useThree } from '@react-three/fiber';
 import { DoubleSide, ExtrudeGeometry, MeshStandardMaterial, Shape } from 'three';
 import { Line } from '@react-three/drei';
-import { useVisualizerStore } from '../zustand/store.js';
+import { useVisualizerStore } from '@/zustand/store.js';
 
 extend({ ExtrudeGeometry });
 
@@ -85,8 +85,8 @@ function generateGridLines(buildPlateSize: [number, number, number], gridSize: n
  * @returns The build plate component.
  */
 function BuildPlate({
-  gridLinesOffeset = 0.15,
-  buildPlateCornerRadius = 8,
+  gridLinesOffeset = 24,
+  buildPlateCornerRadius = 16,
   gridLinesColor = 0xdadada,
   plateColor = 0xe9e9eb,
   buildPlateThickness = 1.5,
@@ -156,11 +156,7 @@ function BuildPlate({
         <meshStandardMaterial attach="material" ref={material} color={plateColor} side={DoubleSide} />
       </mesh>
 
-      <mesh position={[0, -buildPlateZOffset, 0]}>
-        {gridLines.map((gridLine) => (
-          <div>{gridLine}</div>
-        ))}
-      </mesh>
+      <mesh position={[0, -buildPlateZOffset, 0]}>{gridLines}</mesh>
     </>
   );
 }

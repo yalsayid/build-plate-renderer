@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as THREE from 'three';
 import { ThreeEvent, useThree } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
-import { context } from './context';
+import { context } from '@/components/PivotControls/context';
 import { clamp } from 'lodash';
 
 const clickDir = new THREE.Vector3();

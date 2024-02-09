@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as THREE from 'three';
 import { ThreeEvent, useThree } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
-import { context } from './context';
+import { context } from '@/components/PivotControls/context';
 
 const vec1 = new THREE.Vector3();
 const vec2 = new THREE.Vector3();

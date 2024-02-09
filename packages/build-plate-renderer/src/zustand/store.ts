@@ -1,7 +1,7 @@
 import { temporal, TemporalState } from 'zundo';
 import { Box3, Mesh, Vector3 } from 'three';
 import { produce } from 'immer';
-import { IModel, TransformMode } from '../types/types';
+import { IModel, TransformMode } from '@/types/types';
 import { shallow } from 'zustand/shallow';
 import { useStore, create } from 'zustand';
 

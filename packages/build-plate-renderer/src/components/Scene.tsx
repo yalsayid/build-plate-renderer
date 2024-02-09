@@ -1,19 +1,19 @@
 import React, { forwardRef } from 'react';
 import { Canvas, ThreeElements } from '@react-three/fiber';
 import { GizmoHelper, GizmoViewcube, OrbitControls } from '@react-three/drei';
-import BuildPlate, { type BuildPlateProps } from './BuildPlate.js';
-import Model from './Model.js';
-import { IModel } from '../types/types';
-import Lights from './Lights';
-import { useVisualizerStore } from '../zustand/store';
-import { cn } from '../utils';
+import BuildPlate, { type BuildPlateProps } from '@/components/BuildPlate';
+import Model from '@/components/Model';
+import { IModel } from '@/types/types';
+import Lights from '@/components/Lights';
+import { useVisualizerStore } from '@/zustand/store';
+import { cn } from '@/utils/utils.ts';
 
 type GizmoHelperProps = React.ComponentProps<typeof GizmoHelper>;
 type GizmoViewcubeProps = React.ComponentProps<typeof GizmoViewcube>;
 type AxesHelperProps = ThreeElements['axesHelper'];
 type OrbitControlsProps = React.ComponentProps<typeof OrbitControls>;
 
-interface SceneProps extends React.ComponentPropsWithoutRef<typeof Canvas> {
+interface SceneProps extends Omit<React.ComponentPropsWithoutRef<typeof Canvas>, 'children'> {
   gizmoHelperProps?: GizmoHelperProps;
   gizmoViewcubeProps?: GizmoViewcubeProps;
   axesHelperProps?: Partial<AxesHelperProps>;

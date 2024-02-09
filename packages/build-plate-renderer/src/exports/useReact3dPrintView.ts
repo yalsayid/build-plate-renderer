@@ -1,5 +1,5 @@
 import { BufferGeometry, Vector3 } from 'three';
-import { IModel, TransformMode } from '../types/types';
+import { IModel, TransformMode } from '@/types/types';
 import {
   useBuildPlateSize,
   useHoveredModel,

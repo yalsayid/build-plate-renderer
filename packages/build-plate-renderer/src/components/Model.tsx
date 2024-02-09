@@ -3,11 +3,11 @@ import { DoubleSide, Euler, Matrix4, Mesh, Plane, Quaternion, Vector2, Vector3 }
 import { useThree } from '@react-three/fiber';
 import { useGesture } from '@use-gesture/react';
 import { shallow } from 'zustand/shallow';
-import { ModelProps } from '../types/types.js';
-import { useVisualizerStore } from '../zustand/store.js';
-import { isModelOutOfPlate } from '../utils/isModelOutOfPlate.js';
-import { PivotControls } from './PivotControls/index.js';
-import CornerMarkers from './CornerMarkers.js';
+import { ModelProps } from '@/types/types.js';
+import { useVisualizerStore } from '@/zustand/store.js';
+import { isModelOutOfPlate } from '@/utils/isModelOutOfPlate.js';
+import { PivotControls } from '@/components/PivotControls/index.js';
+import CornerMarkers from '@/components/CornerMarkers.js';
 
 type ControlsProto = {
   enabled: boolean;

@@ -1,5 +1,5 @@
-import { useVisualizerStore } from "./store";
-import { IModel, TransformMode } from "../types/types";
+import { useVisualizerStore } from "@/zustand/store";
+import { IModel, TransformMode } from "@/types/types";
 
 const swapModelValues = (model: IModel): IModel => {
   const clonedModel = {

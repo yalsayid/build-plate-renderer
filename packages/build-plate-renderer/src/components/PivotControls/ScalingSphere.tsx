@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as THREE from 'three';
 import { ThreeEvent, useThree } from '@react-three/fiber';
-import { context } from './context';
+import { context } from '@/components/PivotControls/context';
 import { Html } from '@react-three/drei';
 
 const vec1 = new THREE.Vector3();
