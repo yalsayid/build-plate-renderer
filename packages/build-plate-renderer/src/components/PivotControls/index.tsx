@@ -6,8 +6,8 @@ import { AxisArrow } from './AxisArrow';
 import { PlaneSlider } from './PlaneSlider';
 import { AxisRotator } from './AxisRotator';
 import { context, OnDragStartProps } from './context';
-import { ForwardRefComponent } from '../../utils/utils';
 import { ScalingSphere } from './ScalingSphere';
+import { ForwardRefComponent } from '@react-three/drei/helpers/ts-utils';
 
 const tV0 = new THREE.Vector3();
 const tV1 = new THREE.Vector3();

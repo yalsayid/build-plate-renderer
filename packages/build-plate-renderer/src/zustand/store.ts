@@ -1,7 +1,7 @@
 import { temporal, TemporalState } from 'zundo';
 import { Box3, Mesh, Vector3 } from 'three';
 import { produce } from 'immer';
-import { IModel, TransformMode } from '@/types/types';
+import { IModel } from '@/types/types';
 import { shallow } from 'zustand/shallow';
 import { useStore, create } from 'zustand';
 
@@ -31,7 +31,6 @@ interface StoreState {
     rotation: [number, number, number],
     scale: [number, number, number]
   ) => void;
-  setModelTransformMode: (id: string, transformMode: TransformMode) => void;
   setBuildPlateSize: (size: [number, number, number]) => void;
   resetVisualizer: () => void;
 }
@@ -243,15 +242,6 @@ export const useVisualizerStore = create<StoreState>()(
               model.rotation = rotation;
               model.scale = scale;
               model.size = newSize;
-            }
-          })
-        ),
-      setModelTransformMode: (id, transformMode) =>
-        set(
-          produce((draft) => {
-            const model = draft.models.find((m: IModel) => m.id === id);
-            if (model) {
-              model.transformMode = transformMode;
             }
           })
         ),

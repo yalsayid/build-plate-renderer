@@ -1,5 +1,5 @@
 import { useVisualizerStore } from "@/zustand/store";
-import { IModel, TransformMode } from "@/types/types";
+import { IModel } from "@/types/types";
 
 const swapModelValues = (model: IModel): IModel => {
   const clonedModel = {
@@ -97,9 +97,4 @@ export const useSelectedModelScale = (): [number, number, number] | null => {
 export const useSelectedModelSize = (): [number, number, number] | null => {
   const model = useSelectedModel();
   return model ? model.size : null;
-};
-
-export const useSelectedModelTransformMode = (): TransformMode | null => {
-  const model = useSelectedModel();
-  return model ? model.transformMode : null;
 };

@@ -1,5 +1,5 @@
-import { BufferGeometry, Vector3 } from 'three';
-import { IModel, TransformMode } from '@/types/types';
+import { BufferGeometry } from 'three';
+import { IModel } from '@/types/types';
 import {
   useBuildPlateSize,
   useHoveredModel,
@@ -13,11 +13,11 @@ import {
   useSelectedModelRotation,
   useSelectedModelScale,
   useSelectedModelSize,
-  useSelectedModelTransformMode,
 } from '../zustand/selectors';
 import { useTemporalStore, useVisualizerStore } from '../zustand/store';
 import { isModelOutOfPlate } from '../utils/isModelOutOfPlate';
 import { v4 as uuidv4 } from 'uuid';
+import loadGeometry from '@/loaders/GeometryLoader';
 
 const useReact3DPrintView = () => {
   const allObjects = useModels();
@@ -32,7 +32,6 @@ const useReact3DPrintView = () => {
   const selectedObjectScale = useSelectedModelScale();
   const selectedObjectSize = useSelectedModelSize();
   const buildPlateSize = useBuildPlateSize();
-  const selectedObjectTransformMode = useSelectedModelTransformMode();
 
   const {
     addModel,
@@ -45,7 +44,6 @@ const useReact3DPrintView = () => {
     rotateModelAxis,
     scaleModelAxis,
     scaleModelUniform,
-    setModelTransformMode,
     setBuildPlateSize,
     resetVisualizer,
   } = useVisualizerStore();
@@ -56,48 +54,33 @@ const useReact3DPrintView = () => {
     return isModelOutOfPlate(allObjects, buildPlateSize).length > 0;
   };
 
-  /**
-   * Adds a new model to the existing collection of models.
-   *
-   * @param model - This is a combination of two TypeScript types.
-   *                1. Partial<IModel>: This allows for an object that partially fulfills the IModel interface.
-   *                   Not all fields of IModel are required, only those fields that are actually provided will be used.
-   *                2. { id: string; name: string; geometry: BufferGeometry; format: 'stl' | 'obj' | '3mf'; size: [number, number, number]; lowestPoint: number }:
-   *                   This is an object type that enforces the model object must always include these fields, as they are essential for the function logic.
-   *
-   * The function creates a new IModel object, using the provided fields from the model object.
-   * If some optional fields are not provided, it sets some default values.
-   *
-   * Finally, it calls the addModel function to add the new IModel object to the collection of models.
-   */
-  const addNewObject = (
+  const addNewObject = async (
     model: Partial<IModel> & {
       modelId: number;
       modelUrl: string;
-      name: string;
-      geometry: BufferGeometry;
       format: 'stl' | 'obj' | '3mf';
-    }
+    },
+    combineGeometries?: boolean
   ) => {
-    const { geometry } = model;
-    if (!geometry || !geometry.boundingBox) return;
+    // Load geometry from the provided URL and format, respecting the combineGeometries preference
+    const loaded = await loadGeometry(model.modelUrl, model.format, combineGeometries);
 
-    const size = new Vector3();
-    geometry.boundingBox.getSize(size);
+    // Determine if the result is a single geometry or an array of geometries
+    const geometries = loaded.geometry instanceof BufferGeometry ? [loaded.geometry] : loaded.geometry;
 
-    const lowestPoint = geometry.boundingBox.min.y;
+    geometries.forEach((geometry) => {
+      const newModel: IModel = {
+        ...model,
+        id: uuidv4(),
+        geometry, // Use the loaded geometry
+        position: model.position || [0, 0, 0],
+        rotation: model.rotation || [0, 0, 0],
+        scale: model.scale || [1, 1, 1],
+        size: size.toArray() as [number, number, number],
+      };
 
-    const newModel: IModel = {
-      ...model,
-      id: uuidv4(),
-      position: model.position || [0, -lowestPoint || 0, 0],
-      rotation: model.rotation || [0, 0, 0],
-      scale: model.scale || [1, 1, 1],
-      size: size.toArray() as [number, number, number],
-      transformMode: model.transformMode || TransformMode.Translate,
-    };
-
-    addModel(newModel);
+      addModel(newModel);
+    });
   };
 
   const setHoveredObjectById = (id: string | null) => {
@@ -122,13 +105,6 @@ const useReact3DPrintView = () => {
 
   const updateBuildPlateSize = (size: [number, number, number]) => {
     setBuildPlateSize(size);
-  };
-
-  const updateModelTransformMode = (transformMode: TransformMode) => {
-    if (!selectedObjectID) {
-      return;
-    }
-    setModelTransformMode(selectedObjectID, transformMode);
   };
 
   const translateXSelectedObject = (translation: number) => {
@@ -228,7 +204,6 @@ const useReact3DPrintView = () => {
     selectedObjectScale,
     setSelectedObjectById,
     buildPlateSize,
-    selectedObjectTransformMode,
     warningModelsOutOfPlate,
     addNewObject,
     removeSelectedObject,
@@ -245,7 +220,6 @@ const useReact3DPrintView = () => {
     scaleUniformSelectedObject,
     clearAllObjects,
     updateBuildPlateSize,
-    updateModelTransformMode,
     undoLastAction,
     redoLastAction,
     clearActionHistory,
