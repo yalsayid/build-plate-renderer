@@ -12,7 +12,6 @@ import {
   useSelectedModelRaw,
   useSelectedModelRotation,
   useSelectedModelScale,
-  useSelectedModelSize,
 } from '../zustand/selectors';
 import { useTemporalStore, useVisualizerStore } from '../zustand/store';
 import { isModelOutOfPlate } from '../utils/isModelOutOfPlate';
@@ -30,7 +29,6 @@ const useReact3DPrintView = () => {
   const selectedObjectPosition = useSelectedModelPosition();
   const selectedObjectRotation = useSelectedModelRotation();
   const selectedObjectScale = useSelectedModelScale();
-  const selectedObjectSize = useSelectedModelSize();
   const buildPlateSize = useBuildPlateSize();
 
   const {
@@ -76,7 +74,6 @@ const useReact3DPrintView = () => {
         position: model.position || [0, 0, 0],
         rotation: model.rotation || [0, 0, 0],
         scale: model.scale || [1, 1, 1],
-        size: size.toArray() as [number, number, number],
       };
 
       addModel(newModel);
@@ -198,7 +195,6 @@ const useReact3DPrintView = () => {
     selectedObjectRaw,
     selectedObjectID,
     selectedObjectFormat,
-    selectedObjectSize,
     selectedObjectPosition,
     selectedObjectRotation,
     selectedObjectScale,

@@ -4,7 +4,6 @@ export interface ModelProps {
   id: string;
   geometry: BufferGeometry;
   format: 'stl' | 'obj' | '3mf';
-  size: [number, number, number];
 }
 
 export interface IModel {
@@ -14,5 +13,4 @@ export interface IModel {
   position: [number, number, number];
   rotation: [number, number, number];
   scale: [number, number, number];
-  size: [number, number, number];
 }

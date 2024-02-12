@@ -6,13 +6,11 @@ const swapModelValues = (model: IModel): IModel => {
     ...model,
     position: [...model.position],
     scale: [...model.scale],
-    size: [...model.size],
     rotation: [...model.rotation],
   };
 
   clonedModel.position = [clonedModel.position[0], -clonedModel.position[2], clonedModel.position[1]];
   clonedModel.scale = [clonedModel.scale[0], clonedModel.scale[2], clonedModel.scale[1]];
-  clonedModel.size = [clonedModel.size[0], clonedModel.size[2], clonedModel.size[1]];
   clonedModel.rotation = [clonedModel.rotation[0], clonedModel.rotation[2], clonedModel.rotation[1]];
 
   return {
@@ -20,7 +18,6 @@ const swapModelValues = (model: IModel): IModel => {
     position: clonedModel.position as [number, number, number],
     rotation: clonedModel.rotation as [number, number, number],
     scale: clonedModel.scale as [number, number, number],
-    size: clonedModel.size as [number, number, number]
   };
 };
 
@@ -92,9 +89,4 @@ export const useSelectedModelRotation = (): [number, number, number] | null => {
 export const useSelectedModelScale = (): [number, number, number] | null => {
   const model = useSelectedModel();
   return model ? model.scale : null;
-};
-
-export const useSelectedModelSize = (): [number, number, number] | null => {
-  const model = useSelectedModel();
-  return model ? model.size : null;
 };
