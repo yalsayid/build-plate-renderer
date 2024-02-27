@@ -1,19 +1,39 @@
-import { useEffect, useRef } from 'react';
-import { DoubleSide, Euler, Matrix4, Mesh, Quaternion, Vector3 } from 'three';
+import { useEffect, useMemo, useRef } from 'react';
+import { DoubleSide, Euler, Matrix4, Mesh, Plane, Quaternion, Vector2, Vector3 } from 'three';
+import { useThree } from '@react-three/fiber';
+import { useGesture } from '@use-gesture/react';
 import { shallow } from 'zustand/shallow';
-import { ModelProps } from '@/types/types.js';
-import { useVisualizerStore } from '@/zustand/store.js';
-import { isModelOutOfPlate } from '@/utils/isModelOutOfPlate.js';
-import { PivotControls } from '@/components/PivotControls/index.js';
-import CornerMarkers from '@/components/CornerMarkers.js';
+import { ModelProps } from '../types/types';
+import { useVisualizerStore } from '../zustand/store';
+import { isModelOutOfPlate } from '../utils/isModelOutOfPlate';
+import { PivotControls } from './PivotControls';
+import CornerMarkers from './CornerMarkers';
+
+type ControlsProto = {
+  enabled: boolean;
+};
 
 function Model({ id, geometry }: Omit<ModelProps, 'name' | 'size'>) {
   const meshRef = useRef<Mesh>(null);
   const matrixRef = useRef(new Matrix4());
 
-  const { currentModel, hoveredModel, buildPlateSize, transformModel, model } = useVisualizerStore(
+  // @ts-expect-error new in @react-three/fiber@7.0.5
+  const defaultControls = useThree((state) => state.controls) as ControlsProto;
+  const { raycaster, camera, size } = useThree();
+
+  const {
+    currentModel,
+    hoveredModel,
+    buildPlateSize,
+    rotateModel,
+    translateModel,
+    transformModel,
+    setCurrentModel,
+    setHoveredModel,
+  } = useVisualizerStore();
+
+  const { model } = useVisualizerStore(
     (state) => ({
-      ...state,
       model: state.models.find((m) => m.id === id),
     }),
     shallow
@@ -33,107 +53,113 @@ function Model({ id, geometry }: Omit<ModelProps, 'name' | 'size'>) {
     matrixRef.current = matrixRef.current.clone();
   }, [model?.position, model?.rotation, model?.scale]);
 
-  // const { mouse2D, mouse3D, offset, plane, defaultModelPos } = useMemo(
-  //   () => ({
-  //     mouse2D: new Vector2(),
-  //     mouse3D: new Vector3(),
-  //     offset: new Vector3(),
-  //     plane: new Plane(),
-  //     defaultModelPos: new Vector3(),
-  //   }),
-  //   []
-  // );
+  const { mouse2D, mouse3D, offset, plane, defaultModelPos } = useMemo(
+    () => ({
+      mouse2D: new Vector2(),
+      mouse3D: new Vector3(),
+      offset: new Vector3(),
+      plane: new Plane(),
+      defaultModelPos: new Vector3(),
+    }),
+    []
+  );
 
-  // const bind = useGesture(
-  //   {
-  //     onPointerOver: ({ event }) => {
-  //       event.stopPropagation();
-  //     },
-  //     onPointerDown: ({ event }) => {
-  //       event.stopPropagation();
-  //     },
+  const getModelPosition = () => matrixRef.current.decompose(defaultModelPos, new Quaternion(), new Vector3());
 
-  //     onClick: ({ event }) => {
-  //       event.stopPropagation();
-  //       setCurrentModel(id);
-  //     },
+  const bind = useGesture(
+    {
+      onPointerOver: ({ event }) => {
+        event.stopPropagation();
+      },
+      onPointerDown: ({ event }) => {
+        event.stopPropagation();
+      },
 
-  //     onHover: ({ hovering }) => {
-  //       setHoveredModel(hovering ? id : null);
-  //       document.body.style.cursor = hovering ? 'pointer' : 'auto';
-  //     },
-  //     onDragStart: ({ event }) => {
-  //       defaultControls.enabled = false;
-  //       document.body.style.cursor = 'move';
+      onClick: ({ event }) => {
+        event.stopPropagation();
+        setCurrentModel(id);
+      },
+      onContextMenu: ({ event }) => {
+        event.stopPropagation();
+        setCurrentModel(id);
+      },
 
-  //       const { point } = event as any;
-  //       updateModelPosition();
+      onHover: ({ hovering }) => {
+        setHoveredModel(hovering ? id : null);
+        document.body.style.cursor = hovering ? 'pointer' : 'auto';
+      },
+      onDragStart: ({ event }) => {
+        defaultControls.enabled = false;
+        document.body.style.cursor = 'move';
 
-  //       mouse3D.copy(point);
-  //       offset.copy(mouse3D).sub(defaultModelPos);
-  //     },
-  //     onDrag: ({ xy: [x, y], intentional }) => {
-  //       if (!intentional) return;
+        const { point } = event as any;
+        getModelPosition();
 
-  //       const nx = ((x - size.left) / size.width) * 2 - 1;
-  //       const ny = -((y - size.top) / size.height) * 2 + 1;
+        mouse3D.copy(point);
+        offset.copy(mouse3D).sub(defaultModelPos);
+      },
+      onDrag: ({ xy: [x, y], intentional }) => {
+        if (!intentional) return;
 
-  //       mouse2D.set(nx, ny);
-  //       raycaster.setFromCamera(mouse2D, camera);
-  //       plane.setFromNormalAndCoplanarPoint(camera.up, mouse3D);
-  //       raycaster.ray.intersectPlane(plane, mouse3D);
+        const nx = ((x - size.left) / size.width) * 2 - 1;
+        const ny = -((y - size.top) / size.height) * 2 + 1;
 
-  //       // Update the matrix with the new position, maintaining the y-coordinate as initially clicked
-  //       matrixRef.current.setPosition(
-  //         mouse3D.x - offset.x,
-  //         defaultModelPos.y, // Maintain the initial y-coordinate
-  //         mouse3D.z - offset.z
-  //       );
-  //     },
-  //     onDragEnd: () => {
-  //       defaultControls.enabled = true;
-  //       document.body.style.cursor = 'auto';
+        mouse2D.set(nx, ny);
+        raycaster.setFromCamera(mouse2D, camera);
+        plane.setFromNormalAndCoplanarPoint(camera.up, mouse3D);
+        raycaster.ray.intersectPlane(plane, mouse3D);
 
-  //       const newPosition = new Vector3();
-  //       matrixRef.current.decompose(newPosition, new Quaternion(), new Vector3());
+        // Update the matrix with the new position, maintaining the y-coordinate as initially clicked
+        matrixRef.current.setPosition(
+          mouse3D.x - offset.x,
+          defaultModelPos.y, // Maintain the initial y-coordinate
+          mouse3D.z - offset.z
+        );
+      },
+      onDragEnd: () => {
+        defaultControls.enabled = true;
+        document.body.style.cursor = 'auto';
 
-  //       translateModel(id, newPosition.toArray());
-  //     },
-  //   },
-  //   {
-  //     drag: {
-  //       filterTaps: true,
-  //       tapsThreshold: 1,
-  //     },
-  //   }
-  // );
+        const newPosition = new Vector3();
+        matrixRef.current.decompose(newPosition, new Quaternion(), new Vector3());
+
+        translateModel(id, newPosition.toArray());
+      },
+    },
+    {
+      drag: {
+        filterTaps: true,
+        tapsThreshold: 1,
+      },
+    }
+  );
 
   return (
     <>
       <PivotControls
         visible={currentModel === id}
-        autoTransform={false}
+        autoTransform={true}
         matrix={matrixRef.current}
-        onDrag={(l) => {
-          matrixRef.current.copy(l);
-        }}
-        onDragEnd={() => {
-          const newPosition = new Vector3();
-          const newRotationQuaternion = new Quaternion();
-          const newRotationEuler = new Euler();
-          const newScale = new Vector3();
+        // onDrag={(l) => {
+        //   matrixRef.current.copy(l);
+        // }}
+        // onDragEnd={() => {
+        //   const newPosition = new Vector3();
+        //   const newRotationQuaternion = new Quaternion();
+        //   const newRotationEuler = new Euler();
+        //   const newScale = new Vector3();
 
-          matrixRef.current.decompose(newPosition, newRotationQuaternion, newScale);
-          newRotationEuler.setFromQuaternion(newRotationQuaternion, 'YXZ');
+        //   matrixRef.current.decompose(newPosition, newRotationQuaternion, newScale);
+        //   newRotationEuler.setFromQuaternion(newRotationQuaternion, 'YXZ');
 
-          // Update the model
-          transformModel(
-            id,
-            newPosition.toArray(),
-            newRotationEuler.toArray().slice(0, 3) as [number, number, number],
-            newScale.toArray()
-          );
-        }}
+        //   // Update the model
+        //   transformModel(
+        //     id,
+        //     newPosition.toArray(),
+        //     newRotationEuler.toArray().slice(0, 3) as [number, number, number],
+        //     newScale.toArray()
+        //   );
+        // }}
         fixed
         disableSliders
         depthTest={false}
@@ -143,7 +169,7 @@ function Model({ id, geometry }: Omit<ModelProps, 'name' | 'size'>) {
         lineWidth={5}
         annotations={false}
       >
-        <mesh ref={meshRef} name={id} dispose={null} userData={{ type: 'model' }}>
+        <mesh {...(bind() as any)} ref={meshRef} name={id} dispose={null} userData={{ type: 'model' }}>
           <primitive object={geometry} attach="geometry" />
           <meshPhongMaterial
             color={
